@@ -180,6 +180,14 @@ Documented in `docs/phone-setup.md`, no console clicking:
 
 While travel mode is on, the phone's SIM doesn't ring at all, so the app must be registered and on Wi-Fi or data. Missed calls still end up in CommsCentral voicemail.
 
+### 7.5 Missed calls, quiet hours and screening (added after v1)
+
+- **Missed calls:** the number's status callback (`/voice/call-status`) checks, when an inbound call ends, whether any leg was answered or a recording exists. If neither, it sends a "missed call" notification. Can be turned off.
+- **Quiet hours:** a daily window (may wrap midnight) in a configurable IANA time zone, so it follows Fabian when travelling. Calls go straight to voicemail.
+- **Screening:** blocked numbers or prefixes get `<Reject reason="busy">`. Calls with a hidden number can ring, go to voicemail, or be rejected.
+- Order of rules: blocked, hidden number, owner calling, voicemail mode, quiet hours, ring.
+- New settings fields have defaults, so existing settings documents keep working.
+
 ## 8. Admin UI
 
 - **Stack:** SvelteKit, TypeScript, plain CSS or Pico CSS.

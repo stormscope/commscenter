@@ -57,6 +57,32 @@ describe('inbound', () => {
   });
 });
 
+describe('call screening and quiet hours', () => {
+  const late = new Date('2026-11-19T22:30:00Z'); // 23:30 in Zurich
+  const noon = new Date('2026-11-19T11:00:00Z');
+
+  it('rejects blocked callers with a busy signal', () => {
+    const s = settings((x) => (x.screening.blocked = ['+41900', '+41449999999']));
+    expect(inbound(s, { From: '+41449999999' }, noon).toString()).toContain(
+      '<Reject reason="busy"/>',
+    );
+  });
+
+  it('applies the anonymous rule', () => {
+    const vm = settings((x) => (x.screening.anonymous = 'voicemail'));
+    expect(inbound(vm, { From: 'anonymous' }, noon).toString()).toContain('<Record');
+    const rej = settings((x) => (x.screening.anonymous = 'reject'));
+    expect(inbound(rej, { From: '+266696687' }, noon).toString()).toContain('<Reject');
+    expect(inbound(settings(), { From: 'anonymous' }, noon).toString()).toContain('<Dial');
+  });
+
+  it('sends calls to voicemail during quiet hours', () => {
+    const s = settings((x) => (x.quietHours.enabled = true));
+    expect(inbound(s, { From: '+41449999999' }, late).toString()).toContain('<Record');
+    expect(inbound(s, { From: '+41449999999' }, noon).toString()).toContain('<Dial');
+  });
+});
+
 describe('voicemail', () => {
   it('says the greeting and records with a status callback', () => {
     const xml = voicemail(settings()).toString();

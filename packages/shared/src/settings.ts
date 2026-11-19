@@ -19,6 +19,26 @@ export const greetingSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('url'), url: z.url() }),
 ]);
 
+const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use HH:MM, e.g. 22:00');
+
+const timeZone = z.string().refine((tz) => {
+  try {
+    new Intl.DateTimeFormat('en-GB', { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}, 'Unknown time zone, use e.g. Europe/Zurich');
+
+export const DEFAULT_QUIET_HOURS = {
+  enabled: false,
+  from: '22:00',
+  to: '07:30',
+  timeZone: 'Europe/Zurich',
+};
+
+export const DEFAULT_SCREENING = { blocked: [] as string[], anonymous: 'ring' as const };
+
 export const settingsSchema = z.object({
   version: z.literal(1),
   owner: z.object({
@@ -36,8 +56,22 @@ export const settingsSchema = z.object({
     notify: z.object({
       email: z.email().nullable(),
       sms: z.boolean(),
+      /** Also tell Fabian about calls that ended without an answer or a message. */
+      missedCalls: z.boolean().default(true),
     }),
   }),
+  /** Straight to voicemail in these hours (local time of `timeZone`, can wrap midnight). */
+  quietHours: z
+    .object({ enabled: z.boolean(), from: hhmm, to: hhmm, timeZone })
+    .default(DEFAULT_QUIET_HOURS),
+  screening: z
+    .object({
+      /** E.164 numbers or prefixes (e.g. +4190) that are rejected with a busy signal. */
+      blocked: z.array(z.string().regex(/^\+\d{2,15}$/, 'Use +41... format')).max(500),
+      /** What to do with calls that hide their number. */
+      anonymous: z.enum(['ring', 'voicemail', 'reject']),
+    })
+    .default(DEFAULT_SCREENING),
   outbound: z.object({
     allowedPrefixes: z.array(prefix).min(1),
   }),
@@ -71,8 +105,10 @@ export function defaultSettings(input: DefaultSettingsInput): Settings {
         voice: 'Polly.Amy',
       },
       maxLengthSec: 120,
-      notify: { email: input.notifyEmail, sms: false },
+      notify: { email: input.notifyEmail, sms: false, missedCalls: true },
     },
+    quietHours: DEFAULT_QUIET_HOURS,
+    screening: DEFAULT_SCREENING,
     outbound: { allowedPrefixes: input.allowedPrefixes },
   } satisfies Settings);
 }

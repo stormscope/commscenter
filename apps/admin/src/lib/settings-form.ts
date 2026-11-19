@@ -34,7 +34,24 @@ export function settingsFromForm(
         voice: str('greetingVoice'),
       },
       maxLengthSec: num('maxLengthSec'),
-      notify: { email: str('notifyEmail') || null, sms: on('notifySms') },
+      notify: {
+        email: str('notifyEmail') || null,
+        sms: on('notifySms'),
+        missedCalls: on('notifyMissed'),
+      },
+    },
+    quietHours: {
+      enabled: on('quietEnabled'),
+      from: str('quietFrom'),
+      to: str('quietTo'),
+      timeZone: str('quietTimeZone'),
+    },
+    screening: {
+      blocked: str('blocked')
+        .split(/[\n,]+/)
+        .map((n) => n.replace(/[\s.\-()/]/g, ''))
+        .filter(Boolean),
+      anonymous: str('anonymous'),
     },
     outbound: {
       allowedPrefixes: str('allowedPrefixes')

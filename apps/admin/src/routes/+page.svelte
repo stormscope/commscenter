@@ -27,6 +27,17 @@
       </td>
     </tr>
     <tr>
+      <th>Quiet hours</th>
+      <td>
+        {#if data.settings?.quietHours.enabled}
+          {data.settings.quietHours.from} to {data.settings.quietHours.to}
+          ({data.settings.quietHours.timeZone})
+        {:else}
+          Off
+        {/if}
+      </td>
+    </tr>
+    <tr>
       <th>Outbound caller ID</th>
       <td>
         {#if data.settings}

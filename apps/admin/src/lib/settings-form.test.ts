@@ -26,6 +26,13 @@ const base = {
   maxLengthSec: '90',
   notifyEmail: 'me@example.com',
   allowedPrefixes: '+41, +46 +90',
+  notifyMissed: 'on',
+  quietEnabled: 'on',
+  quietFrom: '22:00',
+  quietTo: '07:30',
+  quietTimeZone: 'Europe/Istanbul',
+  blocked: '+41 44 999 99 99\n+41900',
+  anonymous: 'voicemail',
 };
 
 describe('settingsFromForm', () => {
@@ -37,7 +44,21 @@ describe('settingsFromForm', () => {
     expect(r.settings.inbound.targets).toEqual([
       { kind: 'sip', address: 'sip:me@cc.sip.twilio.com', enabled: true },
     ]);
-    expect(r.settings.voicemail.notify).toEqual({ email: 'me@example.com', sms: false });
+    expect(r.settings.voicemail.notify).toEqual({
+      email: 'me@example.com',
+      sms: false,
+      missedCalls: true,
+    });
+    expect(r.settings.quietHours).toEqual({
+      enabled: true,
+      from: '22:00',
+      to: '07:30',
+      timeZone: 'Europe/Istanbul',
+    });
+    expect(r.settings.screening).toEqual({
+      blocked: ['+41449999999', '+41900'],
+      anonymous: 'voicemail',
+    });
   });
 
   it('adds the mobile SIM as a target when asked', () => {
