@@ -41,7 +41,7 @@ Re-run `pnpm bootstrap` any time to change something. Previous answers are the d
 
 ## Phone setup
 
-See [docs/phone-setup.md](docs/phone-setup.md): installing the app, travel mode codes, and testing.
+See [docs/phone-setup.md](docs/phone-setup.md): installing the app, travel mode codes, and testing. A one-page overview is in [docs/guide/CommsCentral-guide.pdf](docs/guide/CommsCentral-guide.pdf).
 
 `pnpm infra:sip-creds` prints the app settings again.
 

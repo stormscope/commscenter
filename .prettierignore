@@ -4,3 +4,4 @@ build
 .svelte-kit
 node_modules
 SPEC.md
+docs/guide
