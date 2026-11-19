@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.svelte-kit/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+# local bootstrap answers (no secrets) and Pulumi local state
+.commscentral.json
+.pulumi-state/
+infra/Pulumi.*.yaml
