@@ -20,7 +20,8 @@
     "infra:env": "tsx scripts/write-admin-env.ts",
     "infra:sip-creds": "tsx scripts/sip-creds.ts",
     "admin": "pnpm --filter @commscentral/admin run start",
-    "infra:destroy": "tsx scripts/pulumi.ts destroy"
+    "infra:destroy": "tsx scripts/pulumi.ts destroy",
+    "doctor": "tsx scripts/doctor.ts"
   },
   "devDependencies": {
     "@inquirer/prompts": "^8.8.0",
