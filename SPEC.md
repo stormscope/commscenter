@@ -72,7 +72,7 @@ The settings schema already uses a list of ring targets, so ring groups or the m
 2. **The forwarded leg is charged by the carrier.** A forward to a Swiss number is usually billed as a national call from Fabian's plan, which is included in most unlimited Swiss plans. Check with his carrier (Q2).
 3. **The original caller's number normally comes through on a forward.** So the app shows who is calling, not just "forwarded call".
 4. **The phone app needs proper push support to ring reliably when the phone is locked**, especially on iOS. Not every SIP app does this with Twilio. Groundwire (Acrobits) keeps the registration in its own cloud and sends a push to the phone, and that works with any SIP server including Twilio. Linphone's push needs the provider's server to cooperate, which Twilio doesn't. Recommendation: Groundwire (Q5).
-5. **Data use while abroad** is about 0.5 to 1 MB per minute of call. On Wi-Fi or a cheap local eSIM it's negligible. On Swiss roaming data it may not be.
+5. **Data use while abroad** is about 0.5 to 1 MB per minute of call. Fabian travels with a Revolut data eSIM (about 1 GB+ available worldwide), so data is not the constraint: an hour of calls is roughly 30 to 60 MB. With a dual-SIM phone the SIP app uses whichever line carries data, while the Salt SIM stays the voice line for the forwarding codes.
 6. **Twilio Functions are public HTTPS endpoints.** They are protected by Twilio's request signatures, not a VPN. Only the admin UI is behind the VPN.
 
 ## 6. Architecture
@@ -241,6 +241,9 @@ Conclusion: Twilio is cheaper than the Swiss SIP provider on every route except 
 
 ### 9.4 Carrier Wi-Fi Calling as a partial alternative
 
+Fabian is on Salt, so this applies. It's a useful fallback on hotel Wi-Fi, but it doesn't replace CommsCentral: Wi-Fi Calling only works on Wi-Fi (not over the Revolut eSIM's data), abroad-to-Switzerland calls may still be billed without an international allowance, and calls arriving while he's on mobile data abroad still roam. The SIP app works over any data connection.
+
+
 According to [internet-offer.ch](https://www.internet-offer.ch/de/guide/wifi-calling) (June 2026) and [Comparis](https://www.comparis.ch/telecom/mobile/handynutzung/wifi-calling), Swisscom and Sunrise don't offer Wi-Fi Calling abroad. Salt does, and treats it largely like being in Switzerland, though calls to Switzerland may cost extra without an international allowance. If Fabian is on Salt, check this first: it may cover U1 and U2 with no setup at all.
 
 ### 9.5 Monthly estimate
@@ -350,7 +353,7 @@ M1 alone already delivers the cheap Sweden calls and calls home from abroad.
 ## 15. Open questions
 
 - **Q1. Number:** a Swiss local number (recommended, 1.15 USD / month, needs a Swiss address for the regulatory bundle).
-- **Q2. Carrier:** Swisscom, Sunrise or Salt, and which plan? This decides whether forwarding to a Swiss number is included, whether Sweden is already included (U3), and whether Salt Wi-Fi Calling already covers U1 and U2.
+- **Q2. Carrier (answered 2026-11-19):** Salt on a low plan without roaming calls or SMS, plus a Revolut eSIM with worldwide data. Calls and SMS while roaming are expensive, data is effectively free. This is exactly the case the app-first design is for. Still worth checking once: whether Salt bills an unconditional forward to a Swiss number (usually counts as a national call).
 - **Q3. Voicemail notification:** email via Resend free tier, via an existing mailbox (SMTP), or SMS?
 - **Q4. Caller ID:** show Fabian's own mobile number on outbound calls (recommended), or the CommsCentral number?
 - **Q5. Phone OS and app:** iPhone or Android? Recommendation: Groundwire.

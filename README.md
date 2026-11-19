@@ -4,7 +4,7 @@ A minimal personal phone setup on Twilio. One Swiss number in the cloud, a SIP a
 
 What it does (see [SPEC.md](SPEC.md) for the full design and costs):
 
-- **Abroad, calling Switzerland:** call from the phone app over Wi-Fi or data. Twilio places the call from Switzerland, with your usual mobile number as caller ID.
+- **Abroad, calling Switzerland:** call from the phone app over Wi-Fi or any data connection (e.g. a travel data eSIM). Twilio places the call from Switzerland, with your usual mobile number as caller ID.
 - **Abroad, being called:** turn on "travel mode" (an unconditional forward from your mobile to the CommsCentral number). Calls stay in Switzerland, ring the app, and go to CommsCentral voicemail with an email if you don't answer. Your carrier's roaming voicemail is never involved.
 - **At home, calling abroad:** calls to Sweden cost about 0.08 USD/min to a mobile and 0.02 USD/min to a landline, instead of 0.60 to 0.90 CHF/min.
 

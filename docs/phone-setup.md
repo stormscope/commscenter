@@ -67,6 +67,14 @@ Don't use these while roaming: the call would first be routed to you abroad and 
 
 Forwarding to a Swiss number is normally billed as a national call and included in unlimited Swiss plans. If your plan doesn't include it, each forwarded minute costs the national rate.
 
-## Data use
+## Data use and dual SIM
 
-A call uses about 0.5 to 1 MB per minute. Use Wi-Fi or a local data SIM when abroad rather than roaming data.
+A call uses about 0.5 to 1 MB per minute, so an hour of calls is roughly 30 to 60 MB. Any data connection works: Wi-Fi, a travel data eSIM (e.g. Revolut), or roaming data.
+
+With a dual-SIM phone (Salt for voice, a data eSIM abroad):
+
+- Set the data eSIM as the mobile data line while travelling. The app follows whichever line has data.
+- Dial the travel mode codes on the **Salt** line, since that's the number being forwarded. On iPhone, pick the line before dialling; on Android, the dialler asks.
+- Calls and SMS on the Salt SIM while roaming are what cost money. With travel mode on, the Salt SIM doesn't ring at all.
+
+Salt's own Wi-Fi Calling also works abroad, but only on Wi-Fi, not over the eSIM's data. The app is the one that works everywhere.
