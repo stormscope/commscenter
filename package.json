@@ -1,0 +1,41 @@
+{
+  "name": "commscentral",
+  "private": true,
+  "description": "Minimal personal phone setup on Twilio: SIP app, voicemail, cheap international calls.",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "bootstrap": "tsx scripts/bootstrap.ts",
+    "build": "pnpm -r run build",
+    "typecheck": "tsc -p tsconfig.json && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm format:check && pnpm typecheck && pnpm test",
+    "infra:preview": "pnpm build && tsx scripts/pulumi.ts preview",
+    "infra:up": "pnpm build && tsx scripts/pulumi.ts up",
+    "infra:env": "tsx scripts/write-admin-env.ts",
+    "infra:sip-creds": "tsx scripts/sip-creds.ts",
+    "admin": "pnpm --filter @commscentral/admin run start",
+    "infra:destroy": "tsx scripts/pulumi.ts destroy"
+  },
+  "devDependencies": {
+    "@inquirer/prompts": "^8.8.0",
+    "@types/node": "^24.0.0",
+    "prettier": "^3.10.1",
+    "prettier-plugin-svelte": "^4.2.0",
+    "tsx": "^4.23.15",
+    "twilio": "^5.13.1",
+    "typescript": "^6.0.0",
+    "vitest": "^5.1.1",
+    "@commscentral/shared": "workspace:*"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

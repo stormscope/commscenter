@@ -1,0 +1,26 @@
+{
+  "name": "@commscentral/admin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local admin UI. Runs on your machine or a tailnet host; no login.",
+  "scripts": {
+    "dev": "vite dev --host 127.0.0.1 --port 5170",
+    "build": "vite build",
+    "start": "vite build && node scripts/start.js",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@commscentral/shared": "workspace:*",
+    "twilio": "^5.13.1"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^5.5.8",
+    "@sveltejs/kit": "^2.70.4",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.58.0",
+    "svelte-check": "^4.7.8",
+    "vite": "^8.3.8"
+  }
+}

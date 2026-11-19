@@ -1,0 +1,14 @@
+name: commscentral
+description: CommsCentral, a personal phone setup on Twilio
+runtime:
+  name: nodejs
+  options:
+    # The program is compiled by `pnpm build` (tsc) before every preview/up.
+    typescript: false
+    packagemanager: pnpm
+main: dist/index.js
+# State lives on this machine by default (no account needed). Secrets in it are
+# encrypted with the passphrase in ~/.commscentral/passphrase. To use Pulumi Cloud
+# instead, remove this block and run `pulumi login`.
+backend:
+  url: file://~/.commscentral/pulumi-state

@@ -1,0 +1,20 @@
+{
+  "name": "@commscentral/functions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Twilio Functions: call routing, voicemail and alerts.",
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@commscentral/shared": "workspace:*",
+    "twilio": "^5.13.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
