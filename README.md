@@ -64,6 +64,7 @@ Settings changed in the UI take effect on the next call. They live in a Twilio S
 | `pnpm infra:preview`   | Show what a deploy would change                               |
 | `pnpm infra:env`       | Rotate the admin UI's API key and rewrite its `.env`          |
 | `pnpm infra:sip-creds` | Print the phone app settings                                  |
+| `pnpm doctor`          | Check the whole setup against Twilio and explain any problem  |
 | `pnpm infra:destroy`   | Remove everything except the phone number and geo permissions |
 | `pnpm admin`           | Run the admin UI                                              |
 | `pnpm check`           | Format check, typecheck and tests                             |
@@ -84,8 +85,12 @@ docs/             phone setup
 - The number's voice webhook is `/voice/inbound`. It rings the app (`<Dial><Sip>`), and `/voice/after-dial` sends anything unanswered to voicemail.
 - The SIP Domain's voice URL is `/sip/outbound`. It normalizes what you dialled, checks it against the allowed countries, and dials out.
 - `/voice/voicemail-done` gets the recording and emails it to you (MP3 attached), or sends an SMS.
-- `/alerts/usage` receives Twilio's monthly spend triggers.
-- All functions are "protected": Twilio rejects requests without a valid Twilio signature.
+- `/alerts/usage` receives Twilio's monthly spend triggers. It is public (Twilio doesn't promise to sign usage trigger callbacks) and checks a secret token in its URL instead.
+- All other functions are "protected": Twilio rejects requests without a valid Twilio signature.
+
+## When something doesn't work
+
+Run `pnpm doctor`. It checks, read-only: the account and balance, that the functions are deployed and protected, that the number and SIP domain point at them, the settings document, caller ID verification, geo permissions, spend alerts, the Resend key, and lists Twilio errors from the last 24 hours with links to their explanations.
 
 ## Limits
 

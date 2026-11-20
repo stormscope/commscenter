@@ -37,6 +37,12 @@ const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
 
 /** Packages installed on Twilio instead of bundled (zod alone would add ~800 kB per function). */
 const RUNTIME_DEPENDENCIES = ['twilio', 'zod'];
+
+/**
+ * Functions Twilio calls without a request signature. Twilio usage triggers are not
+ * guaranteed to be signed, so /alerts/usage is public and checks a token in its URL.
+ */
+const PUBLIC_FUNCTIONS = new Set(['/alerts/usage']);
 const pin = (name: string) => (pkg.dependencies[name] ?? 'latest').replace(/^[\^~]/, '');
 
 await rm(outDir, { recursive: true, force: true });
@@ -59,7 +65,12 @@ for (const entry of entries) {
     legalComments: 'none',
     logLevel: 'warning',
   });
-  manifest.push({ path: `/${rel}`, file: `functions/${rel}.js`, access: 'protected' });
+  const path = `/${rel}`;
+  manifest.push({
+    path,
+    file: `functions/${rel}.js`,
+    access: PUBLIC_FUNCTIONS.has(path) ? 'public' : 'protected',
+  });
 }
 
 // The bundles are CommonJS, as the Twilio runtime expects.
@@ -69,7 +80,11 @@ await writeFile(
   JSON.stringify(
     {
       runtime: 'node22',
-      dependencies: Object.fromEntries(RUNTIME_DEPENDENCIES.map((d) => [d, pin(d)])),
+      dependencies: {
+        ...Object.fromEntries(RUNTIME_DEPENDENCIES.map((d) => [d, pin(d)])),
+        // Pins the Twilio runtime version, as the Twilio CLI does for new projects.
+        '@twilio/runtime-handler': '2.1.0',
+      },
       functions: manifest,
     },
     null,

@@ -20,6 +20,8 @@ Run `pnpm infra:sip-creds` and enter what it prints:
 | Media encryption | SRTP (required)                           |
 | Codecs           | Opus, PCMU (G.711 µ-law)                  |
 
+Optional, for lower latency in Europe: use Twilio's Frankfurt edge, `commscentral-xxxxxx.sip.frankfurt.twilio.com`, as the domain. If the app can't register with it, use the plain domain again.
+
 In Groundwire, also set:
 
 - Settings → Incoming calls → Push notifications: on.

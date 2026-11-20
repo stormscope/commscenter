@@ -24,6 +24,18 @@ describe('loadSettings', () => {
   });
 });
 
+describe('usage alert token', () => {
+  it('ignores calls without the right token', async () => {
+    const messages: unknown[] = [];
+    const ctx = fakeContext({ doc: settings(), messages, env: { ALERTS_TOKEN: 'secret-token' } });
+    expect(await run(usage, ctx, { CurrentValue: '99', token: 'nope' })).toEqual({
+      ignored: 'bad token',
+    });
+    expect(await run(usage, ctx, { CurrentValue: '99' })).toEqual({ ignored: 'bad token' });
+    expect(messages).toHaveLength(0);
+  });
+});
+
 describe('handlers', () => {
   it('inbound returns TwiML', async () => {
     const res = await run(inboundHandler, fakeContext({ doc: settings() }), {
@@ -66,7 +78,12 @@ describe('handlers', () => {
   it('falls back to SMS when no email is configured', async () => {
     const messages: unknown[] = [];
     const ctx = fakeContext({ doc: settings((s) => (s.voicemail.notify.email = null)), messages });
-    const res = await run(usage, ctx, { CurrentValue: '21.5', TriggerValue: '20' });
+    ctx.ALERTS_TOKEN = 'secret-token';
+    const res = await run(usage, ctx, {
+      CurrentValue: '21.5',
+      TriggerValue: '20',
+      token: 'secret-token',
+    });
     expect(res).toEqual({ sent: { email: false, sms: true } });
     expect(messages[0]).toMatchObject({ to: OWNER, body: expect.stringContaining('21.50 USD') });
   });

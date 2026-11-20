@@ -1,5 +1,6 @@
 import * as pulumi from '@pulumi/pulumi';
 import { defaultSettings, isoCodesForPrefixes, sipAddressFor } from '@commscentral/shared';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { readConfig } from './config';
 import { loadFunctionBundle } from './functions';
@@ -13,6 +14,12 @@ import { SpendAlerts } from './resources/usage';
 const config = readConfig();
 const creds = pulumi.secret({ accountSid: config.accountSid, authToken: config.authToken });
 const sipAddress = sipAddressFor(config.sipUsername, config.sipDomainPrefix);
+// Shared secret for the public /alerts/usage function, derived so it needs no extra config.
+const alertsToken = pulumi.secret(
+  config.authToken.apply((t) =>
+    createHash('sha256').update(`commscentral-alerts:${t}`).digest('hex').slice(0, 32),
+  ),
+);
 
 // 1. Runtime settings, edited later in the admin UI.
 const settings = new SyncSettings('settings', {
@@ -47,6 +54,7 @@ const functions = new ServerlessDeployment('functions', {
     EMAIL_FROM: config.emailFrom,
     RESEND_API_KEY: config.resendApiKey,
     DEFAULT_COUNTRY_CODE: config.defaultCountryCode,
+    ALERTS_TOKEN: alertsToken,
   },
 });
 
@@ -79,7 +87,7 @@ new GeoPermissions('geo', {
 
 new SpendAlerts('spend-alerts', {
   creds,
-  callbackUrl: pulumi.interpolate`${baseUrl}/alerts/usage`,
+  callbackUrl: pulumi.secret(pulumi.interpolate`${baseUrl}/alerts/usage?token=${alertsToken}`),
   thresholdsUsd: config.spendAlertsUsd,
 });
 

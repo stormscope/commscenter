@@ -11,6 +11,7 @@ export interface CommsEnv {
   EMAIL_FROM?: string;
   RESEND_API_KEY?: string;
   DEFAULT_COUNTRY_CODE?: string;
+  ALERTS_TOKEN?: string;
 }
 
 /** The subset of the Twilio Functions context that CommsCentral uses. */
