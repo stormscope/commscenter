@@ -6,6 +6,8 @@ export interface NumberWebhooksInputs {
   creds: TwilioCreds;
   phoneNumber: string;
   voiceUrl: string;
+  /** Called when a call ends; used for missed-call notifications. */
+  statusCallback: string;
 }
 
 export interface NumberWebhooksOutputs extends NumberWebhooksInputs {
@@ -26,9 +28,13 @@ export const provider: pulumi.dynamic.ResourceProvider = {
   async create(inputs: NumberWebhooksInputs) {
     const client = twilioClient(inputs.creds);
     const numberSid = await findNumberSid(client, inputs.phoneNumber);
-    await client
-      .incomingPhoneNumbers(numberSid)
-      .update({ voiceUrl: inputs.voiceUrl, voiceMethod: 'POST', voiceApplicationSid: '' });
+    await client.incomingPhoneNumbers(numberSid).update({
+      voiceUrl: inputs.voiceUrl,
+      voiceMethod: 'POST',
+      voiceApplicationSid: '',
+      statusCallback: inputs.statusCallback,
+      statusCallbackMethod: 'POST',
+    });
     return { id: numberSid, outs: { ...inputs, numberSid } };
   },
   async diff(id: string, olds: NumberWebhooksOutputs, news: NumberWebhooksInputs) {
@@ -40,14 +46,19 @@ export const provider: pulumi.dynamic.ResourceProvider = {
     };
   },
   async update(id: string, olds: NumberWebhooksOutputs, news: NumberWebhooksInputs) {
-    await twilioClient(news.creds)
-      .incomingPhoneNumbers(id)
-      .update({ voiceUrl: news.voiceUrl, voiceMethod: 'POST' });
+    await twilioClient(news.creds).incomingPhoneNumbers(id).update({
+      voiceUrl: news.voiceUrl,
+      voiceMethod: 'POST',
+      statusCallback: news.statusCallback,
+      statusCallbackMethod: 'POST',
+    });
     return { outs: { ...news, numberSid: id } };
   },
   async delete(id: string, props: NumberWebhooksOutputs) {
     // The number itself is kept (it costs money to buy and needs regulatory approval).
-    await twilioClient(props.creds).incomingPhoneNumbers(id).update({ voiceUrl: '' });
+    await twilioClient(props.creds)
+      .incomingPhoneNumbers(id)
+      .update({ voiceUrl: '', statusCallback: '' });
   },
 };
 

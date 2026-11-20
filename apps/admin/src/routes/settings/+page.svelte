@@ -7,6 +7,16 @@
     s?.inbound.targets.some((t) => t.kind === 'pstn' && t.enabled) ?? false,
   );
   const greeting = $derived(s?.voicemail.greeting.kind === 'tts' ? s.voicemail.greeting : null);
+  const zones = [
+    'Europe/Zurich',
+    'Europe/Stockholm',
+    'Europe/Istanbul',
+    'Europe/London',
+    'America/New_York',
+    'Asia/Dubai',
+    'Asia/Singapore',
+  ];
+  const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 </script>
 
 <h1>Settings</h1>
@@ -130,6 +140,55 @@
           <input type="checkbox" name="notifySms" checked={s.voicemail.notify.sms} /> Also send an SMS
         </label>
         <span class="muted">(SMS is always used when email is off or fails)</span>
+        <br />
+        <label>
+          <input type="checkbox" name="notifyMissed" checked={s.voicemail.notify.missedCalls} /> Tell
+          me about missed calls without a message
+        </label>
+      </p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Quiet hours</legend>
+      <label>
+        <input type="checkbox" name="quietEnabled" checked={s.quietHours.enabled} /> Send calls straight
+        to voicemail
+      </label>
+      from <input name="quietFrom" size="5" value={s.quietHours.from} />
+      to <input name="quietTo" size="5" value={s.quietHours.to} />
+      <p>
+        <label>
+          Time zone
+          <input name="quietTimeZone" size="20" list="zones" value={s.quietHours.timeZone} />
+        </label>
+        <datalist id="zones">
+          {#each zones as z (z)}<option value={z}></option>{/each}
+        </datalist>
+        <br /><span class="muted">
+          Set this to where you are when travelling, e.g. Europe/Istanbul. Your browser says: {browserZone}
+        </span>
+      </p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Screening</legend>
+      <label>
+        Hidden numbers
+        <select name="anonymous">
+          <option value="ring" selected={s.screening.anonymous === 'ring'}>Ring as usual</option>
+          <option value="voicemail" selected={s.screening.anonymous === 'voicemail'}>
+            Straight to voicemail
+          </option>
+          <option value="reject" selected={s.screening.anonymous === 'reject'}>
+            Reject (busy)
+          </option>
+        </select>
+      </label>
+      <p>
+        <label>
+          Blocked numbers or prefixes, one per line (they hear a busy signal)<br />
+          <textarea name="blocked" rows="4" cols="30">{s.screening.blocked.join('\n')}</textarea>
+        </label>
       </p>
     </fieldset>
 

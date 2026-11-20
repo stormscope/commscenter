@@ -1,5 +1,12 @@
 import twilio from 'twilio';
-import { checkDestination, normalizeNumber, type Settings } from '@commscentral/shared';
+import {
+  checkDestination,
+  isAnonymous,
+  isBlocked,
+  isQuietTime,
+  normalizeNumber,
+  type Settings,
+} from '@commscentral/shared';
 
 const { VoiceResponse } = twilio.twiml;
 type Response = InstanceType<typeof VoiceResponse>;
@@ -42,12 +49,43 @@ export function voicemail(settings: Settings, response: Response = new VoiceResp
   return response;
 }
 
+export type InboundDecision = 'reject' | 'voicemail' | 'ring';
+
+/**
+ * What to do with an inbound call, in order: blocked callers are rejected, the owner
+ * and quiet hours go to voicemail, hidden numbers follow the anonymous rule.
+ */
+export function decideInbound(
+  settings: Settings,
+  event: { From?: string },
+  now: Date = new Date(),
+): InboundDecision {
+  if (isBlocked(event.From, settings.screening.blocked)) return 'reject';
+  if (isAnonymous(event.From) && settings.screening.anonymous !== 'ring') {
+    return settings.screening.anonymous === 'reject' ? 'reject' : 'voicemail';
+  }
+  // Fabian calling his own CommsCentral number: ringing his own app makes no sense.
+  if (event.From === settings.owner.mobile) return 'voicemail';
+  if (settings.inbound.mode === 'voicemail') return 'voicemail';
+  if (isQuietTime(now, settings.quietHours)) return 'voicemail';
+  return 'ring';
+}
+
 /** Inbound call to the CommsCentral number: ring the app (and any other targets), else voicemail. */
 export function inbound(
   settings: Settings,
   event: { From?: string; ForwardedFrom?: string },
+  now: Date = new Date(),
 ): Response {
   const response = new VoiceResponse();
+  const decision = decideInbound(settings, event, now);
+  if (decision === 'reject') {
+    // A busy signal tells the caller nothing, and costs nothing.
+    response.reject({ reason: 'busy' });
+    return response;
+  }
+  if (decision === 'voicemail') return voicemail(settings, response);
+
   // Never ring the number a call was just forwarded from (travel mode), or it loops back here.
   // Carriers send ForwardedFrom in different formats, so normalize it first.
   const fwd = event.ForwardedFrom ? normalizeNumber(event.ForwardedFrom) : null;
@@ -56,12 +94,7 @@ export function inbound(
     (t) => t.enabled && !(t.kind === 'pstn' && t.address === forwardedFrom),
   );
 
-  // Fabian calling his own CommsCentral number: ringing his own app makes no sense.
-  const fromOwner = event.From === settings.owner.mobile;
-
-  if (settings.inbound.mode === 'voicemail' || targets.length === 0 || fromOwner) {
-    return voicemail(settings, response);
-  }
+  if (targets.length === 0) return voicemail(settings, response);
 
   const dial = response.dial({
     timeout: settings.inbound.ringTimeoutSec,

@@ -76,6 +76,7 @@ const number = new NumberWebhooks('number', {
   creds,
   phoneNumber: config.twilioNumber,
   voiceUrl: pulumi.interpolate`${baseUrl}/voice/inbound`,
+  statusCallback: pulumi.interpolate`${baseUrl}/voice/call-status`,
 });
 
 // 5. Guardrails.

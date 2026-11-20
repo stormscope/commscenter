@@ -51,7 +51,7 @@ See [docs/phone-setup.md](docs/phone-setup.md): installing the app, travel mode 
 pnpm admin   # http://127.0.0.1:5170
 ```
 
-Status, settings, call log with costs, and voicemail playback. It has no login and binds to `127.0.0.1`. To reach it over your VPN, set `ADMIN_HOST` in `apps/admin/.env` to the machine's VPN address (for example its Tailscale IP). Never expose it to the internet.
+Status, settings (ringing, quiet hours with time zone, blocked numbers, hidden-number handling, notifications), call log with costs and a block button, and voicemail playback. It has no login and binds to `127.0.0.1`. To reach it over your VPN, set `ADMIN_HOST` in `apps/admin/.env` to the machine's VPN address (for example its Tailscale IP). Never expose it to the internet.
 
 Settings changed in the UI take effect on the next call. They live in a Twilio Sync document, not in Pulumi, so a redeploy doesn't overwrite them.
 
@@ -84,6 +84,7 @@ docs/             phone setup
 
 - The number's voice webhook is `/voice/inbound`. It rings the app (`<Dial><Sip>`), and `/voice/after-dial` sends anything unanswered to voicemail.
 - The SIP Domain's voice URL is `/sip/outbound`. It normalizes what you dialled, checks it against the allowed countries, and dials out.
+- `/voice/call-status` is the number's status callback. When a call ends with no answer and no message, it sends a missed-call notification.
 - `/voice/voicemail-done` gets the recording and emails it to you (MP3 attached), or sends an SMS.
 - `/alerts/usage` receives Twilio's monthly spend triggers. It is public (Twilio doesn't promise to sign usage trigger callbacks) and checks a secret token in its URL instead.
 - All other functions are "protected": Twilio rejects requests without a valid Twilio signature.

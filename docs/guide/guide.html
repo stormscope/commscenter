@@ -127,11 +127,11 @@
   <section>
     <h2>What it does</h2>
     <ul class="yes">
-      <li>Calls in and out over the app, worldwide, at Swiss rates</li>
       <li>Your own voicemail, emailed with the recording attached</li>
-      <li>Optional ringing of your SIM too, with "press 1 to accept" so carrier voicemail can't pick up</li>
-      <li>Blocks every country you didn't allow, plus Swiss premium numbers</li>
-      <li>Email/SMS alerts when monthly spend passes 20 and 50 USD</li>
+      <li>Missed-call alerts when someone hangs up without leaving a message</li>
+      <li>Quiet hours in your current time zone; blocking; hidden-number rules</li>
+      <li>Optional SIM ringing with "press 1", so carrier voicemail can't answer</li>
+      <li>Allowed countries only; spend alerts; <code>pnpm doctor</code> health check</li>
     </ul>
   </section>
 
@@ -142,7 +142,6 @@
       <li>Ring you without data while travel mode is on: calls go to voicemail</li>
       <li>SMS on your number (Swiss local numbers may not support it)</li>
       <li>Multiple users, ring groups, IVR menus: planned, not built</li>
-      <li>Take over your mobile number: it stays with your carrier</li>
     </ul>
   </section>
 
@@ -151,13 +150,12 @@
     <div class="grid" style="row-gap:0; column-gap:7mm">
       <ul>
         <li><b>Only use the unconditional forward abroad.</b> "No answer" forwarding (<code>**61*</code>) still routes the call to you abroad and back, which is the cost this avoids.</li>
-        <li><b>Turn travel mode off when you're back,</b> or your SIM never rings.</li>
+        <li><b>Turn travel mode off when you're back,</b> or your SIM never rings. Check once how Salt bills the forward.</li>
         <li><b>The Swiss number needs Twilio's regulatory approval</b> (address and ID) once, which takes 1 to 3 business days. Bootstrap waits for it.</li>
         <li><b>Back up <code>~/.commscentral/passphrase</code>.</b> Without it, the encrypted Pulumi config can't be read.</li>
       </ul>
       <ul>
         <li><b>The first run is the real test.</b> All code is unit-tested, but it hasn't run against a live Twilio account yet. Expect a fix or two.</li>
-        <li><b>Your carrier bills the forward leg,</b> usually as a national call that's included in unlimited Swiss plans. Worth checking once.</li>
         <li><b>Dual SIM: dial the travel codes on the Salt line.</b> The app runs on whichever line has data (e.g. the Revolut eSIM); a call uses about 0.5–1 MB per minute.</li>
         <li><b>Resend without your own domain</b> only sends to your Resend account's email address.</li>
       </ul>

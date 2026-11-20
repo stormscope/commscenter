@@ -85,6 +85,8 @@ await check('Phone number', async () => {
       `${number} voice URL is "${n.voiceUrl}"`,
       `Expected ${expected}. Run "pnpm infra:up".`,
     );
+  if (n.statusCallback !== `${base}/voice/call-status`)
+    report('warn', 'Missed-call notifications are not wired up', 'Run "pnpm infra:up".');
 });
 
 await check('SIP domain', async () => {
